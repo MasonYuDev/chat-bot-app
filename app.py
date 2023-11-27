@@ -19,7 +19,7 @@ def main():
 
     # Create a folder with the repository name
     repo_name = os.path.basename(st.session_state.repo_url.rstrip('/'))
-    repo_folder = os.path.join('/content', repo_name)
+    repo_folder = os.path.join('/tmp/content', repo_name)
     os.makedirs(repo_folder, exist_ok=True)
 
     # Clone the repository
