@@ -7,7 +7,10 @@ def main():
     port = int(os.environ.get("PORT", 8501))
 
     st.title("Your Chatbot")
-    st.header("Use Your Chatbot")
+    st.write('''This app will ingest all of your content that you upload to a github repo.
+             You'll need to provide a repo of your content (check mine https://github.com/MasonYuDev/Mason-Writing-Corpus)
+             and your OpenAI API key. After that, you can ask it to write application questions for you as long as the content
+             you uploaded is relevant to your query.''')
     
     with st.form(key='user_input_form'):
         st.session_state.repo_url = st.text_input("Enter GitHub Repository URL:")
