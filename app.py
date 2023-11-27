@@ -42,7 +42,6 @@ def main():
             response = st.session_state.query_engine.query(query)
             st.write(f"Mason says: {response.response}")
             
-    st.run_app(port=port)
     
 if __name__ == "__main__":
     main()
