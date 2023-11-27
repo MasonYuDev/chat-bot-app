@@ -13,9 +13,10 @@ def main():
     st.text_input("Enter GitHub Repository URL:", key = "repo_url")
     st.text_input("Enter OpenAI API Key:", key = "api_key")
     
-    if not st.session_state.repo_url or not st.session_state.api_key:
-        st.error("Please enter a valid GitHub Repository URL and OpenAI API Key.")
-        return
+    if st.button("Submit"):
+        if not st.session_state.repo_url or not st.session_state.api_key:
+            st.error("Please enter a valid GitHub Repository URL and OpenAI API Key.")
+            return
 
     # Create a folder with the repository name
     repo_name = os.path.basename(st.session_state.repo_url.rstrip('/'))
