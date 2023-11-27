@@ -1,45 +1,48 @@
-from llama_index import SimpleDirectoryReader, ServiceContext, GPTListIndex, readers, VectorStoreIndex, LLMPredictor, PromptHelper, StorageContext, load_index_from_storage
-from llama_index.callbacks import CallbackManager, LlamaDebugHandler
-from langchain.chat_models import ChatOpenAI
 import streamlit as st
-import sys
 import os
-from IPython.display import Markdown, display
+from construct_index import construct_index
 
-
-def construct_index(directory_path):
-    # set maximum input size
-    max_input_size = 4096
-    # set number of output tokens
-    num_outputs = 1024
-    # set maximum chunk overlap
-    max_chunk_overlap = 20
-    # set chunk size limit
-    chunk_size_limit = 600
-    chunk_overlap_ratio = 0.5
-
-    # define LLM or Language Model Wrapper
-    llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=num_outputs))
-    prompt_helper = PromptHelper(max_input_size, num_outputs, chunk_overlap_ratio, chunk_size_limit=chunk_size_limit)
-
-    llama_debug = LlamaDebugHandler(print_trace_on_end=True)
-    callback_manager = CallbackManager([llama_debug])
-
-    service_context = ServiceContext.from_defaults(callback_manager=callback_manager, llm_predictor=llm_predictor)
-
-    documents = SimpleDirectoryReader(directory_path).load_data()
-    index = VectorStoreIndex.from_documents(documents, service_context=service_context)
-    query_engine = index.as_query_engine()
-
-    return query_engine
 
 def main():
-  query_engine = construct_index('/content/Mason-Writing-Corpus')
-  while True:
-        query = input("What do you want to do? ")
-        if query == "quit":
-            break
-        else:
-            response = query_engine.query(query)
-            print(f"Mason says: <b>{response.response}</b>")
+    port = int(os.environ.get("PORT", 8501))
 
+
+    st.title("Your Chatbot")
+    st.header("Use Your Chatbot")
+    
+    st.text_input("Enter GitHub Repository URL:", key = "repo_url")
+    st.text_input("Enter OpenAI API Key:", key = "api_key")
+    
+    if not st.session_state.repo_url or not st.session_state.api_key:
+        st.error("Please enter a valid GitHub Repository URL and OpenAI API Key.")
+        return
+
+    # Create a folder with the repository name
+    repo_name = os.path.basename(st.session_state.repo_url.rstrip('/'))
+    repo_folder = os.path.join('/content', repo_name)
+    os.makedirs(repo_folder, exist_ok=True)
+
+    # Clone the repository
+    clone_cmd = f"git clone {st.session_state.repo_url} {repo_folder}"
+    os.system(clone_cmd)
+
+    # Use the correct path to the cloned repository
+    directory_path = repo_folder
+    st.session_state["query_engine"] = construct_index(directory_path, st.session_state.api_key)
+
+    st.success("Repository cloned and indexed successfully!")
+
+    query = st.chat_input("What do you want to know?")
+    if query and st.session_state.query_engine:
+        st.write(query)
+        if query.lower() == "quit":
+            st.stop()
+        else:
+            # Query the engine and display the result
+            response = st.session_state.query_engine.query(query)
+            st.write(f"Mason says: {response.response}")
+            
+    st.run_app(port=port)
+    
+if __name__ == "__main__":
+    main()
