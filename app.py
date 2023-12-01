@@ -8,10 +8,10 @@ import tempfile
 def main():
     port = int(os.environ.get("PORT", 8501))
 
-    st.title("Your Chatbot")
-    st.write('''This app will ingest all of your content that you upload to a github repo.
-             You'll need to provide a repo of your content (check mine https://github.com/MasonYuDev/Mason-Writing-Corpus)
-             and your OpenAI API key. After that, you can ask it to write application questions for you as long as the content
+    st.title("Chatbot from Indexed Documents")
+    st.write('''This app will ingest all of your content that you upload to a github repo or in a JSON file.
+             You'll need to provide a repo of your content (check mine https://github.com/MasonYuDev/Mason-Writing-Corpus) or a JSON file
+             and your OpenAI API key. After that, you can ask it creative questions for you as long as the content
              you uploaded is relevant to your query.''')
     
     content_source = st.radio("Choose content source:", ["GitHub Repo", "JSON File"])
@@ -38,7 +38,7 @@ def main():
                 os.system(clone_cmd)
 
                 directory_path = repo_folder
-                st.session_state["query_engine"] = construct_index(content_source, directory_path, st.session_state.api_key)
+                st.session_state["query_engine"] = construct_index(directory_path, st.session_state.api_key)
                 st.success("Repository cloned and indexed successfully!")
 
         elif content_source == "JSON File":
@@ -57,7 +57,7 @@ def main():
                     with open(entry_filepath, 'w') as entry_file:
                         json.dump(entry, entry_file)
                 print(temp_dir)
-                st.session_state["query_engine"] = construct_index(content_source, temp_dir, st.session_state.api_key)
+                st.session_state["query_engine"] = construct_index(temp_dir, st.session_state.api_key)
                 st.success("JSON File uploaded and indexed successfully!")
 
             else:
