@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 from construct_index import construct_index
+from resume import scrape_dynamic_page, process_web_content, extract_job_requirements, generate_cover_letter
 import json
 import tempfile
 
@@ -8,19 +9,23 @@ import tempfile
 def main():
     port = int(os.environ.get("PORT", 8501))
 
-    st.title("Chatbot from Indexed Documents")
-    st.write('''This app will ingest all of your content that you upload to a github repo or in a JSON file.
-             You'll need to provide a repo of your content (check mine https://github.com/MasonYuDev/Mason-Writing-Corpus) or a JSON file
-             and your OpenAI API key. After that, you can ask it creative questions for you as long as the content
-             you uploaded is relevant to your query.''')
+    st.title("Cover Letter from Indexed Documents & Job Description")
+    st.write('''This app will ingest your Resume, or all your content that you upload to a github repo or in a JSON file.
+             You'll need to upload your resume so that the bot can read about your experiences.
+             Otherwise, you'll need to provide a repo of your content (check mine https://github.com/MasonYuDev/Mason-Writing-Corpus) or a JSON file
+             and your OpenAI API key. 
+             
+             It can take 2 minutes to generate your cover letter.''')
     
-    content_source = st.radio("Choose content source:", ["GitHub Repo", "JSON File"])
+    content_source = st.radio("Choose content source:", ["Folder Upload", "GitHub Repo", "JSON File"])
 
     with st.form(key='user_input_form'):
         if content_source == "GitHub Repo":
             st.session_state.repo_url = st.text_input("Enter GitHub Repository URL:")
         elif content_source == "JSON File":
             uploaded_file = st.file_uploader("Upload JSON File", type=["json"])
+        else:
+            uploaded_file = st.file_uploader("Upload Your Folder")
         st.session_state.api_key = st.text_input("Enter OpenAI API Key:", type='password')
         st.session_state.submitted = st.form_submit_button('Submit')
 
@@ -62,16 +67,43 @@ def main():
 
             else:
                 st.warning("Please upload a valid JSON file.")
+        else:
+            if uploaded_file is not None:
+                temp_dir = tempfile.mkdtemp()
+                file_name = uploaded_file.name
+                file_filepath = os.path.join(temp_dir, file_name)
+
+        # Save the file content to the temporary file
+                with open(file_filepath, 'wb') as file:
+                    print(uploaded_file.read)
+                    file.write(uploaded_file.read())
+
+                st.session_state["query_engine"] = construct_index(temp_dir, st.session_state.api_key)
+                st.success("Index Constructed Successfully!")
+
             
+    query = st.chat_input("Enter URL")
     
-    query = st.chat_input("What do you want to know?")
     if query and st.session_state.query_engine:
         st.write(query)
         if query.lower() == "quit":
             st.stop()
         else:
-            response = st.session_state.query_engine.query(query)
-            st.write(f"Mason says: {response.response}")
+            st.write("extracting page contents...")
+            page_content = scrape_dynamic_page(query)
+            st.write("processing and cleaning the content. This can take a while...")
+            cleaned_content = process_web_content(page_content)
+            st.write(f"This is the cleaned job description: {cleaned_content}")
+            st.write("Now, parsing job requirements...")
+            job_reqs = extract_job_requirements(cleaned_content)
+            st.write(f"This is the job reqs: {job_reqs}")
+            prompt = "From the top 10 most relevant matches for this list of job requirements, please fill in your top professional experiences. Please output in JSON format with the following keys: Requirement, Matching Experience, Supporting Bullet Point(s), Place/Company of Experience, Reasoning."
+            st.write("Finding your job skill matches...")
+            matching_skills = st.session_state.query_engine.query(prompt + job_reqs).response
+            st.write(f"These are your skill matches: {matching_skills}")
+            st.write("Generating cover letter...")
+            cover_letter = generate_cover_letter(cleaned_content, matching_skills)
+            st.write(cover_letter)
             
     
 if __name__ == "__main__":

@@ -2,6 +2,8 @@ from llama_index import SimpleDirectoryReader, ServiceContext, VectorStoreIndex,
 from llama_index.callbacks import CallbackManager, LlamaDebugHandler
 from langchain.chat_models import ChatOpenAI
 import os
+import pypdf
+import docx2txt
 
 
 def construct_index(content_data, openai_key):
