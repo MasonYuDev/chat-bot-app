@@ -8,6 +8,7 @@ def scrape_dynamic_page(url):
   chrome_options = Options()
   chrome_options.add_argument('--headless')
   chrome_options.add_argument('--disable-gpu')
+  chrome_options.add_argument('--no-sandbox')
 
   # Set up the webdriver
   driver = webdriver.Chrome(options=chrome_options)
