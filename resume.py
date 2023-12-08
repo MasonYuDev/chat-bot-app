@@ -1,10 +1,17 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from openai import OpenAI
 
 def scrape_dynamic_page(url):
 
-  driver = webdriver.Chrome()
+  chrome_options = Options()
+  chrome_options.add_argument('--headless')
+  chrome_options.add_argument('--no-sandbox')
+  chrome_options.add_argument('--disable-dev-shm-usage')
+
+  # Set up the webdriver
+  driver = webdriver.Chrome(options=chrome_options)
   job_description_url = url
   driver.get(job_description_url)
   content = driver.page_source
