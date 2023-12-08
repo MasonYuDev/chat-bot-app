@@ -1,3 +1,7 @@
 streamlit
 llama-index
 langchain
+selenium
+pypdf
+docx2txt
+bs4
