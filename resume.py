@@ -2,12 +2,10 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from openai import OpenAI
-from pyvirtualdisplay import Display
 
 
 def scrape_dynamic_page(url):
-  display = Display(visible=0, size=(800, 600))
-  display.start()
+
   chrome_options = Options()
   chrome_options.add_argument('--headless')
   chrome_options.add_argument('--disable-gpu')
@@ -44,7 +42,6 @@ def scrape_dynamic_page(url):
 # Get the modified HTML content
   modified_html = str(soup)
   driver.quit()
-  display.stop()
 
   return modified_html
 
