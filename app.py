@@ -10,14 +10,13 @@ def main():
     port = int(os.environ.get("PORT", 8501))
 
     st.title("Cover Letter from Indexed Documents & Job Description")
-    st.write('''This app will ingest your Resume, or all your content that you upload to a github repo or in a JSON file.
-             You'll need to upload your resume so that the bot can read about your experiences.
-             Otherwise, you'll need to provide a repo of your content (check mine https://github.com/MasonYuDev/Mason-Writing-Corpus) or a JSON file
-             and your OpenAI API key. 
-             
-             It can take 2 minutes to generate your cover letter.''')
+    st.write('''Upload your resume in Docx or PDF format. Alternatively, upload all your content through a github repo or in a JSON file.
+             \nThen add your API key.
+             \nAfter your content has been indexed into the database, submit the URL of the job description.
+             \nWatch as the bot completes each step.
+             \nIt can take 2 minutes to generate your cover letter.''')
     
-    content_source = st.radio("Choose content source:", ["Folder Upload", "GitHub Repo", "JSON File"])
+    content_source = st.radio("Choose content source:", ["File Upload", "GitHub Repo", "JSON File"])
 
     with st.form(key='user_input_form'):
         if content_source == "GitHub Repo":
@@ -25,7 +24,7 @@ def main():
         elif content_source == "JSON File":
             uploaded_file = st.file_uploader("Upload JSON File", type=["json"])
         else:
-            uploaded_file = st.file_uploader("Upload Your Folder")
+            uploaded_file = st.file_uploader("Upload Your File")
         st.session_state.api_key = st.text_input("Enter OpenAI API Key:", type='password')
         st.session_state.submitted = st.form_submit_button('Submit')
 

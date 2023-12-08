@@ -1,4 +1,4 @@
-
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from openai import OpenAI
 
@@ -9,13 +9,35 @@ def scrape_dynamic_page(url):
   driver.get(job_description_url)
   content = driver.page_source
 
+  soup = BeautifulSoup(content, 'html.parser')
+
+# Remove hreflang tags
+  for tag in soup.find_all('link', hreflang=True):
+    tag.extract()
+
+# Remove cookiereport tags
+  for tag in soup.find_all(class_=lambda x: x and 'CookieReports' in x):
+    tag.extract()
+# Remove country options
+  for tag in soup.find_all('option', value=True):
+    tag.extract()
+
+# Remove CSS stylings
+  for tag in soup.find_all(True):
+    tag.attrs = {}
+
+  for style_tag in soup.find_all('style'):
+    style_tag.clear()
+
+# Get the modified HTML content
+  modified_html = str(soup)
   driver.quit()
-  return content
+  return modified_html
 
 def process_web_content(html_content):
   system = "You are a helpful product manager who will clean dirty html content scraped from a job description, and return only the exact job description and title. Please return a JSON object with these 2 parameters."
   user = html_content
-  model = "gpt-4-1106-preview"
+  model = "gpt-4"
   max_tokens = 1500
   temperature = 0.1
   return run_open_ai(model, system, user, max_tokens, 1, None, temperature)
