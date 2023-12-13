@@ -9,12 +9,12 @@ import tempfile
 def main():
     port = int(os.environ.get("PORT", 8501))
 
-    st.title("Cover Letter from Indexed Documents & Job Description")
-    st.write('''Upload your resume in Docx or PDF format. Alternatively, upload all your content through a github repo or in a JSON file.
-             \nThen add your API key.
-             \nAfter your content has been indexed into the database, submit the URL of the job description.
-             \nWatch as the bot completes each step.
-             \nIt can take 2 minutes to generate your cover letter.''')
+#    st.title("Cover Letter from Indexed Documents & Job Description")
+#    st.write('''Upload your resume in Docx or PDF format. Alternatively, upload all your content through a github repo or in a JSON file.
+#             \nThen add your API key.
+#             \nAfter your content has been indexed into the database, submit the URL of the job description.
+#             \nWatch as the bot completes each step.
+#             \nIt can take 2 minutes to generate your cover letter.''')
     
     content_source = st.radio("Choose content source:", ["File Upload", "GitHub Repo", "JSON File"])
 
