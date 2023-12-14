@@ -54,7 +54,7 @@ def process_web_content(html_content):
   return run_open_ai(model, system, user, max_tokens, 1, None, temperature)
 
 def extract_job_requirements(job_description):
-  system = "You are a HR automatic resume processor. You have a given job description and will need to return a given set of criteria inferred by this job description. Please output the list of top 10 skills implied by this job description as a JSON object."
+  system = "You are a HR automatic resume processor. You have a given job description and will need to return a given set of criteria inferred by this job description. Please output a simple list of top 15 skills implied by this job description as a JSON object."
   user = job_description
   model = "gpt-4"
   max_tokens = 1500
@@ -68,8 +68,6 @@ def generate_cover_letter(job_description, matching_skills):
   max_tokens = 1300
   temperature = 1
   return run_open_ai(model, system, user, max_tokens, 1, None, temperature)
-
-
 
 def run_open_ai(model, system, user, tokens, n, stop, temp):
   """

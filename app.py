@@ -81,27 +81,27 @@ def main():
                 st.success("Index Constructed Successfully!")
 
             
-    query = st.chat_input("Enter URL")
+    query = st.chat_input("Paste job description here: ")
     
     if query and st.session_state.query_engine:
         st.write(query)
         if query.lower() == "quit":
             st.stop()
         else:
-            st.write("extracting page contents...")
-            page_content = scrape_dynamic_page(query)
-            st.write("processing and cleaning the content. This can take a while...")
-            cleaned_content = process_web_content(page_content)
-            st.write(f"This is the cleaned job description: {cleaned_content}")
+#            st.write("extracting page contents...")
+#            page_content = scrape_dynamic_page(query)
+#            st.write("processing and cleaning the content. This can take a while...")
+#            cleaned_content = process_web_content(query)
+#            st.write(f"This is the cleaned job description: {cleaned_content}")
             st.write("Now, parsing job requirements...")
-            job_reqs = extract_job_requirements(cleaned_content)
+            job_reqs = extract_job_requirements(query)
             st.write(f"This is the job reqs: {job_reqs}")
-            prompt = "From the top 10 most relevant matches for this list of job requirements, please fill in your top professional experiences. Please output in JSON format with the following keys: Requirement, Matching Experience, Supporting Bullet Point(s), Place/Company of Experience, Reasoning."
+            prompt = "For each of the following job requirements, please tell me when, where and what the candidate contributed that reflect this job requirement's experience. If no relevant experience, then just output no. Use varied experience examples. Please output in JSON format with the following keys: Job Requirement, Candidate Experience Summary, Company Name, Job Role"
             st.write("Finding your job skill matches...")
             matching_skills = st.session_state.query_engine.query(prompt + job_reqs).response
             st.write(f"These are your skill matches: {matching_skills}")
             st.write("Generating cover letter...")
-            cover_letter = generate_cover_letter(cleaned_content, matching_skills)
+            cover_letter = generate_cover_letter(query, matching_skills)
             st.write(cover_letter)
             
     
