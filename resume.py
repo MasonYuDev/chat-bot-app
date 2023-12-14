@@ -48,7 +48,7 @@ def scrape_dynamic_page(url):
 def process_web_content(html_content):
   system = "You are a helpful product manager who will clean dirty html content scraped from a job description, and return only the exact job description and title. Please return a JSON object with these 2 parameters."
   user = html_content
-  model = "gpt-4"
+  model = "gpt-3.5-turbo-16k"
   max_tokens = 1500
   temperature = 0.1
   return run_open_ai(model, system, user, max_tokens, 1, None, temperature)
